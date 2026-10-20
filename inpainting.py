@@ -4,11 +4,17 @@ import numpy as np
 def generer_lignes_aleatoires(dimensions, nb_lignes=20, epaisseur_max=4):
     """Génère une liste de traits aléatoires."""
     hauteur, largeur = dimensions[:2]
+    # 1. Création d'une matrice noire (valeur 0) en entiers non signés 8 bits
+    # 0 = pixel sain (à conserver), 255 = pixel dégradé (à réparer)
+    masque = np.zeros((hauteur, largeur), dtype=np.uint8)
     lignes = []
 
+    # Dessin de traits aléatoires
     for _ in range(nb_lignes):
+        # Cordonnées (x,y) aléatoires dans la limite de l'image
         pt1 = (np.random.randint(0, largeur), np.random.randint(0, hauteur))
         pt2 = (np.random.randint(0, largeur), np.random.randint(0, hauteur))
+        # Épaisseur aléatoire entre 1 et epaisseur_max pixels
         epaisseur = np.random.randint(1, epaisseur_max + 1)
         lignes.append((pt1, pt2, epaisseur))
 
@@ -28,7 +34,14 @@ img = cv.imread('images/images.jfif')
 if img is None:
     raise FileNotFoundError("Image introuvable. Vérifiez le chemin du fichier.")
 
-NB_LIGNES = 25
+# Création automatique du masque aux dimensions exactes de l'image
+masque = generer_masque_aleatoire(img.shape, nb_lignes=25, epaisseur_max=5)
+
+# Création de l'image dégradée (pixels masqués remplacés par du blanc)
+img_abimee = img.copy()
+img_abimee[masque == 255] = 255
+
+# Restauration avec les deux méthodes d'OpenCV
 rayon = 3
 lignes = generer_lignes_aleatoires(img.shape, nb_lignes=NB_LIGNES, epaisseur_max=5)
 
