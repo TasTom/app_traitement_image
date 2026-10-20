@@ -8,9 +8,9 @@ def generer_masque_aleatoire(dimensions, nb_lignes=20, epaisseur_max=4):
     # 0 = pixel sain (à conserver), 255 = pixel dégradé (à réparer)
     masque = np.zeros((hauteur, largeur), dtype=np.uint8)
 
-    #Dessin de traits aléatoires
+    # Dessin de traits aléatoires
     for _ in range(nb_lignes):
-        #Cordonnées (x,y) aléatoires dans la limite de l'image
+        # Cordonnées (x,y) aléatoires dans la limite de l'image
         pt1 = (np.random.randint(0, largeur), np.random.randint(0, hauteur))
         pt2 = (np.random.randint(0, largeur), np.random.randint(0, hauteur))
         # Épaisseur aléatoire entre 1 et epaisseur_max pixels
@@ -26,7 +26,7 @@ if img is None:
     raise FileNotFoundError("Image introuvable. Vérifiez le chemin du fichier.")
 
 # Création automatique du masque aux dimensions exactes de l'image
-#On passe img.shape pour garantir que le masque a EXACTEMENT la même taille
+# On passe img.shape pour garantir que le masque a EXACTEMENT la même taille
 masque = generer_masque_aleatoire(img.shape, nb_lignes=25, epaisseur_max=5)
 
 # Création de l'image dégradée (pixels masqués remplacés par du blanc)
@@ -40,7 +40,7 @@ img_abimee[masque == 255] = 255
 # Rayon du voisinage circulaire considéré autour de chaque pixel à reconstruire
 rayon = 3
 
-#Méthode A : Algorithme de Telea (Fast Marching Method)
+# Méthode A : Algorithme de Telea (Fast Marching Method)
 restaure_telea = cv.inpaint(img_abimee, masque, rayon, cv.INPAINT_TELEA)
 
 # Méthode B : Algorithme de Navier-Stokes (Mécanique des fluides)
