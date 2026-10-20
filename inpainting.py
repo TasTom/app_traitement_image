@@ -15,7 +15,7 @@ def generer_masque_aleatoire(dimensions, nb_lignes=20, epaisseur_max=4):
     return masque
 
 # Chargement de l'image
-img = cv.imread('fleurs.jpeg')
+img = cv.imread('images/fleurs.jpeg')
 if img is None:
     raise FileNotFoundError("Image introuvable. Vérifiez le chemin du fichier.")
 
