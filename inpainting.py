@@ -1,17 +1,14 @@
 import cv2 as cv
 import numpy as np
 
+# Génération de lignes aléatoires pour créer un masque
 def generer_lignes_aleatoires(dimensions, nb_lignes=20, epaisseur_max=4):
-    """Génère une liste de traits aléatoires."""
     hauteur, largeur = dimensions[:2]
-    # 1. Création d'une matrice noire (valeur 0) en entiers non signés 8 bits
-    # 0 = pixel sain (à conserver), 255 = pixel dégradé (à réparer)
-    masque = np.zeros((hauteur, largeur), dtype=np.uint8)
     lignes = []
 
     # Dessin de traits aléatoires
     for _ in range(nb_lignes):
-        # Cordonnées (x,y) aléatoires dans la limite de l'image
+        # Coordonnées (x,y) aléatoires dans la limite de l'image
         pt1 = (np.random.randint(0, largeur), np.random.randint(0, hauteur))
         pt2 = (np.random.randint(0, largeur), np.random.randint(0, hauteur))
         # Épaisseur aléatoire entre 1 et epaisseur_max pixels
@@ -20,9 +17,8 @@ def generer_lignes_aleatoires(dimensions, nb_lignes=20, epaisseur_max=4):
 
     return lignes
 
-
+# Création d'un masque à partir des lignes générées
 def dessiner_masque(dimensions, lignes):
-    """Dessine un masque binaire (0 et 255) à partir de traits aléatoires."""
     hauteur, largeur = dimensions[:2]
     masque = np.zeros((hauteur, largeur), dtype=np.uint8)
     for pt1, pt2, epaisseur in lignes:
@@ -34,15 +30,10 @@ img = cv.imread('images/images.jfif')
 if img is None:
     raise FileNotFoundError("Image introuvable. Vérifiez le chemin du fichier.")
 
-# Création automatique du masque aux dimensions exactes de l'image
-masque = generer_masque_aleatoire(img.shape, nb_lignes=25, epaisseur_max=5)
-
-# Création de l'image dégradée (pixels masqués remplacés par du blanc)
-img_abimee = img.copy()
-img_abimee[masque == 255] = 255
-
-# Restauration avec les deux méthodes d'OpenCV
-rayon = 3
+# Paramètres pour la génération du masque
+NB_LIGNES = 25
+# Rayon du voisinage considéré autour de chaque pixel à reconstruire
+rayon = 3 
 lignes = generer_lignes_aleatoires(img.shape, nb_lignes=NB_LIGNES, epaisseur_max=5)
 
 
@@ -55,6 +46,7 @@ def degradation(val):
     img_abimee[masque_courant == 255] = 255
 
     if nb_lignes_actives:
+        # TELEA bords de zones vers intérieur, NS propagation de la couleur
         restaure_telea = cv.inpaint(img_abimee, masque_courant, rayon, cv.INPAINT_TELEA)
         restaure_ns = cv.inpaint(img_abimee, masque_courant, rayon, cv.INPAINT_NS)
     else:
